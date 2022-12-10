@@ -6,11 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Comment } from "./Comment";
 import { User } from "./User";
+import { Comment } from "./Comment";
 
-@Index("unq_like_comment", ["likeId", "likeCommentUserId"], { unique: true })
 @Index("fk_like_comment_comment", ["likeCommentId"], {})
+@Index("unq_like_comment", ["likeId", "likeCommentUserId"], { unique: true })
 @Entity("like_comment", { schema: "Polydate" })
 export class LikeComment {
   @PrimaryGeneratedColumn({ type: "int", name: "like_id" })
@@ -22,15 +22,11 @@ export class LikeComment {
   @Column("int", { name: "like_comment_id" })
   likeCommentId: number;
 
-  @Column("timestamp", { name: "like_comment_date", default: () => "'now()'" })
-  likeCommentDate: Date;
-
-  @ManyToOne(() => Comment, (comment) => comment.likeComments, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+  @Column("timestamp", {
+    name: "like_comment_date",
+    default: () => "CURRENT_TIMESTAMP",
   })
-  @JoinColumn([{ name: "like_comment_id", referencedColumnName: "commentId" }])
-  likeComment: Comment;
+  likeCommentDate: Date;
 
   @ManyToOne(() => User, (user) => user.likeComments, {
     onDelete: "NO ACTION",
@@ -40,4 +36,11 @@ export class LikeComment {
     { name: "like_comment_user_id", referencedColumnName: "userId" },
   ])
   likeCommentUser: User;
+
+  @ManyToOne(() => Comment, (comment) => comment.likeComments, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "like_comment_id", referencedColumnName: "commentId" }])
+  likeComment: Comment;
 }

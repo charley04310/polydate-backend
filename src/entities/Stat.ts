@@ -9,6 +9,7 @@ import { Comment } from "./Comment";
 import { Match } from "./Match";
 import { Post } from "./Post";
 
+@Index("IDX_596dd435e39750ec705f7bef59", ["statLabel"], { unique: true })
 @Index("unq_stat", ["statLabel"], { unique: true })
 @Entity("stat", { schema: "Polydate" })
 export class Stat {

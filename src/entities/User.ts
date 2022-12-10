@@ -50,7 +50,7 @@ export class User {
   comments: Comment[];
 
   @OneToMany(() => Image, (image) => image.imageUser)
-  images: Image[];
+  images: Promise<Image[]>;
 
   @OneToMany(() => LikeComment, (likeComment) => likeComment.likeCommentUser)
   likeComments: LikeComment[];

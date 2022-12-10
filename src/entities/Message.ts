@@ -6,11 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Match } from "./Match";
 import { User } from "./User";
+import { Match } from "./Match";
 
-@Index("fk_message_user", ["messageUserId"], {})
 @Index("fk_message_match", ["messageMatchId"], {})
+@Index("fk_message_user", ["messageUserId"], {})
 @Entity("message", { schema: "Polydate" })
 export class Message {
   @PrimaryGeneratedColumn({ type: "int", name: "message_id" })
@@ -25,15 +25,11 @@ export class Message {
   @Column("varchar", { name: "message_content", length: 250 })
   messageContent: string;
 
-  @Column("timestamp", { name: "message_date", default: () => "'now()'" })
-  messageDate: Date;
-
-  @ManyToOne(() => Match, (match) => match.messages, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+  @Column("timestamp", {
+    name: "message_date",
+    default: () => "CURRENT_TIMESTAMP",
   })
-  @JoinColumn([{ name: "message_match_id", referencedColumnName: "matchId" }])
-  messageMatch: Match;
+  messageDate: Date;
 
   @ManyToOne(() => User, (user) => user.messages, {
     onDelete: "NO ACTION",
@@ -41,4 +37,11 @@ export class Message {
   })
   @JoinColumn([{ name: "message_user_id", referencedColumnName: "userId" }])
   messageUser: User;
+
+  @ManyToOne(() => Match, (match) => match.messages, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "message_match_id", referencedColumnName: "matchId" }])
+  messageMatch: Match;
 }

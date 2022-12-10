@@ -20,10 +20,16 @@ export class Session {
   @Column("varchar", { name: "session_ip", length: 50 })
   sessionIp: string;
 
-  @Column("timestamp", { name: "session_start", default: () => "'now()'" })
+  @Column("timestamp", {
+    name: "session_start",
+    default: () => "CURRENT_TIMESTAMP",
+  })
   sessionStart: Date;
 
-  @Column("timestamp", { name: "session_end", default: () => "'now()'" })
+  @Column("timestamp", {
+    name: "session_end",
+    default: () => "CURRENT_TIMESTAMP",
+  })
   sessionEnd: Date;
 
   @ManyToOne(() => User, (user) => user.sessions, {

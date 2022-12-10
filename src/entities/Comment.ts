@@ -13,8 +13,8 @@ import { User } from "./User";
 import { LikeComment } from "./LikeComment";
 
 @Index("fk_comment_post", ["commentPostId"], {})
-@Index("fk_comment_user", ["commentUserId"], {})
 @Index("fk_comment_stat", ["commentStatId"], {})
+@Index("fk_comment_user", ["commentUserId"], {})
 @Entity("comment", { schema: "Polydate" })
 export class Comment {
   @PrimaryGeneratedColumn({ type: "int", name: "comment_id" })

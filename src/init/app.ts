@@ -9,12 +9,11 @@ import { error } from "console";
 
 export class App {
   app: Application;
-
   constructor() {
     this.app = express();
     this.middlewares();
     this.routes();
-   this.connectionToDataBase();
+    this.connectionToDataBase();
   }
 
   private middlewares() {
@@ -35,8 +34,6 @@ export class App {
       console.error("Error during the data source inti", err);
     }
   }
-
-
 
   async listen(port: string | number): Promise<void> {
     this.app.listen(port);

@@ -10,8 +10,9 @@ import {
 import { User } from "./User";
 import { Post } from "./Post";
 
-@Index("unq_image", ["imageLink"], { unique: true })
 @Index("fk_image_user", ["imageUserId"], {})
+@Index("IDX_9c58898805f97d45578e57f77f", ["imageLink"], { unique: true })
+@Index("unq_image", ["imageLink"], { unique: true })
 @Entity("image", { schema: "Polydate" })
 export class Image {
   @PrimaryGeneratedColumn({ type: "int", name: "image_id" })
@@ -23,7 +24,10 @@ export class Image {
   @Column("varchar", { name: "image_link", unique: true, length: 250 })
   imageLink: string;
 
-  @Column("timestamp", { name: "image_date", default: () => "'now()'" })
+  @Column("timestamp", {
+    name: "image_date",
+    default: () => "CURRENT_TIMESTAMP",
+  })
   imageDate: Date;
 
   @ManyToOne(() => User, (user) => user.images, {

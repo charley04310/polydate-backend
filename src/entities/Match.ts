@@ -8,17 +8,18 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Stat } from "./Stat";
-import { TypeMatch } from "./TypeMatch";
 import { User } from "./User";
+import { TypeMatch } from "./TypeMatch";
 import { Message } from "./Message";
 
-@Index("unq_match", ["matchId"], { unique: true })
 @Index("fk_match_stat", ["matchStatId"], {})
 @Index("fk_match_type_match", ["matchTypeId"], {})
+@Index("FK_match_user_a", ["matchSrcId"], {})
 @Index("fk_match_user_b", ["matchDstId"], {})
+@Index("unq_match", ["matchId"], { unique: true })
 @Entity("match", { schema: "Polydate" })
 export class Match {
-  @PrimaryGeneratedColumn({ type: "int", name: "match_id"})
+  @PrimaryGeneratedColumn({ type: "int", name: "match_id" })
   matchId: number;
 
   @Column("int", { primary: true, name: "match_src_id" })
@@ -33,7 +34,10 @@ export class Match {
   @Column("int", { name: "match_type_id" })
   matchTypeId: number;
 
-  @Column("timestamp", { name: "match_date", default: () => "'now()'" })
+  @Column("timestamp", {
+    name: "match_date",
+    default: () => "CURRENT_TIMESTAMP",
+  })
   matchDate: Date;
 
   @ManyToOne(() => Stat, (stat) => stat.matches, {
@@ -43,26 +47,26 @@ export class Match {
   @JoinColumn([{ name: "match_stat_id", referencedColumnName: "statId" }])
   matchStat: Stat;
 
-  @ManyToOne(() => TypeMatch, (typeMatch) => typeMatch.matches, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "match_type_id", referencedColumnName: "typeMatchId" }])
-  matchType: TypeMatch;
-
   @ManyToOne(() => User, (user) => user.matches, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "match_src_id", referencedColumnName: "userId" }])
-  matchSrc: Promise<User>;
+  matchSrc: User;
 
   @ManyToOne(() => User, (user) => user.matches2, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "match_dst_id", referencedColumnName: "userId" }])
-  matchDst: Promise<User>;
+  matchDst: User;
+
+  @ManyToOne(() => TypeMatch, (typeMatch) => typeMatch.matches, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "match_type_id", referencedColumnName: "typeMatchId" }])
+  matchType: TypeMatch;
 
   @OneToMany(() => Message, (message) => message.messageMatch)
   messages: Message[];

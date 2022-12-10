@@ -9,13 +9,13 @@ import {
 } from "typeorm";
 import { Comment } from "./Comment";
 import { LikePost } from "./LikePost";
-import { Image } from "./Image";
 import { Stat } from "./Stat";
 import { User } from "./User";
+import { Image } from "./Image";
 
-@Index("fk_post_user", ["postUserId"], {})
-@Index("fk_post_stat", ["postStatId"], {})
 @Index("fk_post_image", ["postImageLink"], {})
+@Index("fk_post_stat", ["postStatId"], {})
+@Index("fk_post_user", ["postUserId"], {})
 @Entity("post", { schema: "Polydate" })
 export class Post {
   @PrimaryGeneratedColumn({ type: "int", name: "post_id" })
@@ -38,7 +38,10 @@ export class Post {
   @Column("varchar", { name: "post_content", length: 250 })
   postContent: string;
 
-  @Column("timestamp", { name: "post_date", default: () => "'now()'" })
+  @Column("timestamp", {
+    name: "post_date",
+    default: () => "CURRENT_TIMESTAMP",
+  })
   postDate: Date;
 
   @OneToMany(() => Comment, (comment) => comment.commentPost)
@@ -46,13 +49,6 @@ export class Post {
 
   @OneToMany(() => LikePost, (likePost) => likePost.likePost)
   likePosts: LikePost[];
-
-  @ManyToOne(() => Image, (image) => image.posts, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "post_image_link", referencedColumnName: "imageLink" }])
-  postImageLink2: Image;
 
   @ManyToOne(() => Stat, (stat) => stat.posts, {
     onDelete: "NO ACTION",
@@ -67,4 +63,11 @@ export class Post {
   })
   @JoinColumn([{ name: "post_user_id", referencedColumnName: "userId" }])
   postUser: User;
+
+  @ManyToOne(() => Image, (image) => image.posts, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "post_image_link", referencedColumnName: "imageLink" }])
+  postImageLink2: Image;
 }
