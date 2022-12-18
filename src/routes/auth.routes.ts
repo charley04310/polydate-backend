@@ -1,10 +1,10 @@
 import express from "express";
 //import { Request, Response } from "express";
 //import { connect } from "../db/database";
-import AuthControl from "../controllers/auth.controller";
+import { AuthController } from "../controllers/auth.controller";
 const router = express.Router();
 
-router.route("/").get();
+router.route("/login").post(AuthController.login);
 //.post(AuthControl.createUser);
 
 router.route("/:id");

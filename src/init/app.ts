@@ -1,11 +1,9 @@
 import express, { Application } from "express";
 import morgan from "morgan";
 import { AppDataSource } from "../db/app-data-source";
-// Routes
-//import IndexRoutes from './routes/index.routes'
+import cookieParser from "cookie-parser";
 import userRoutes from "../routes/user.routes";
 import authRouter from "../routes/auth.routes";
-import { error } from "console";
 
 export class App {
   app: Application;
@@ -20,6 +18,7 @@ export class App {
     this.app.use(morgan("dev"));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(cookieParser());
   }
 
   private routes() {
