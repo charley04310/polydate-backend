@@ -64,6 +64,10 @@ export class User extends UpdateUserDTO {
   @Length(2, 30)
   userLastname: string;
 
+  @Column("varchar", { name: "user_description", length: 255 })
+  @Length(0, 255)
+  userDescription: string;
+
   @Column("varchar", { name: "user_password", length: 200 })
   userPassword: string;
 

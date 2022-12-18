@@ -11,7 +11,6 @@ import { User } from "./User";
 import { Post } from "./Post";
 
 @Index("fk_image_user", ["imageUserId"], {})
-@Index("IDX_9c58898805f97d45578e57f77f", ["imageLink"], { unique: true })
 @Index("unq_image", ["imageLink"], { unique: true })
 @Entity("image", { schema: "Polydate" })
 export class Image {

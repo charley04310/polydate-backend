@@ -55,6 +55,7 @@ export class UserController extends BaseEntity {
     newUser.userLastname = body.userLastname;
     newUser.userCity = body.userCity;
     newUser.userEmail = body.userEmail;
+    newUser.userDescription = body.userDescription;
     newUser.userPassword = User.setPassword(body.userPassword);
     newUser.userGenreId = parseInt(body.userGenreId);
     newUser.userIciPourId = parseInt(body.userIciPourId);
