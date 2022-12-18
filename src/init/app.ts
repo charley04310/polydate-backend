@@ -4,6 +4,8 @@ import { AppDataSource } from "../db/app-data-source";
 import cookieParser from "cookie-parser";
 import userRoutes from "../routes/user.routes";
 import authRouter from "../routes/auth.routes";
+import imgRouter from "../routes/images.routes";
+import path from "path";
 
 export class App {
   app: Application;
@@ -24,6 +26,7 @@ export class App {
   private routes() {
     this.app.use("/api", userRoutes);
     this.app.use("/auth", authRouter);
+    this.app.use("/images", imgRouter);
   }
   private async connectionToDataBase() {
     try {

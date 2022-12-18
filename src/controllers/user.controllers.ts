@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import { BaseEntity } from "typeorm";
 import { AppDataSource } from "../db/app-data-source";
-import { UpdateUserDTO, User } from "../entities/User";
+import { User } from "../entities/User";
 import { validate } from "class-validator";
 import { USER_ROLE } from "../enums/enums";
 
@@ -70,6 +70,7 @@ export class UserController extends BaseEntity {
       return res.send(results);
     }
   };
+
   static updateUser = async (req: Request, res: Response) => {
     const body = req.body;
     const userRepository = AppDataSource.getRepository(User);
@@ -83,6 +84,7 @@ export class UserController extends BaseEntity {
       console.error("User not found");
       return;
     }
+
     user.userFirstname = body.userFirstname;
     user.userLastname = body.userLastname;
     user.userCity = body.userCity;

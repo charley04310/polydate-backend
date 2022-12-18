@@ -8,7 +8,7 @@ router.route("/user/:id").get(checkJwtCookies, UserController.findOneUserById);
 
 router
   .route("/user")
-  .get(UserController.findAllUser)
+  .get(checkJwtCookies, UserController.findAllUser)
   .post(UserController.createUser)
   .put(checkJwtCookies, UserController.updateUser);
 //.post(userControl.createUser);

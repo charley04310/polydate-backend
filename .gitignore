@@ -2,6 +2,7 @@
 /build
 /output
 .env
+/images
 package-lock.json
 package.json
 tsconfig.json
