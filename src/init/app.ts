@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "../routes/user.routes";
 import authRouter from "../routes/auth.routes";
 import imgRouter from "../routes/images.routes";
-import path from "path";
+import matchRouter from "../routes/match.routes";
 
 export class App {
   app: Application;
@@ -27,6 +27,7 @@ export class App {
     this.app.use("/api", userRoutes);
     this.app.use("/auth", authRouter);
     this.app.use("/images", imgRouter);
+    this.app.use("/match", matchRouter);
   }
   private async connectionToDataBase() {
     try {

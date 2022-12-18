@@ -1,6 +1,5 @@
 import express from "express";
 import { Request, Response } from "express";
-//import { connect } from "../db/database";
 import { UserController } from "../controllers/user.controllers";
 import { checkJwtCookies } from "../middleware/cookieJwtAuth";
 const router = express.Router();

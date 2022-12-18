@@ -7,6 +7,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { IsInt, Length, IsEmail, Min, Max, Contains } from "class-validator";
+
 import { Stat } from "./Stat";
 import { User } from "./User";
 import { TypeMatch } from "./TypeMatch";
@@ -32,6 +34,9 @@ export class Match {
   matchStatId: number;
 
   @Column("int", { name: "match_type_id" })
+  @IsInt()
+  @Max(3)
+  @Min(1)
   matchTypeId: number;
 
   @Column("timestamp", {

@@ -20,7 +20,6 @@ export class UserController extends BaseEntity {
       res.status(400).json("user does'not exist");
     }
   };
-
   static findOneUserByMail = async (email: string, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository
@@ -63,7 +62,7 @@ export class UserController extends BaseEntity {
     const errors = await validate(newUser);
 
     if (errors.length > 0) {
-      res.status(401).send("validation failed. errors: " + errors);
+      res.status(400).send("validation failed. errors: " + errors);
     } else {
       const user = AppDataSource.getRepository(User).create(newUser);
       const results = AppDataSource.getRepository(User).save(user);
@@ -71,7 +70,6 @@ export class UserController extends BaseEntity {
       return res.send(results);
     }
   };
-
   static updateUser = async (req: Request, res: Response) => {
     const body = req.body;
     const userRepository = AppDataSource.getRepository(User);

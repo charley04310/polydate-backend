@@ -1,7 +1,4 @@
 import express from "express";
-import { Request, Response } from "express";
-import multer from "multer";
-import path from "path";
 import { upload } from "../middleware/uploadImages";
 //import { UserController } from "../controllers/user.controllers";
 import { checkJwtCookies } from "../middleware/cookieJwtAuth";
@@ -16,8 +13,5 @@ router
     checkJwtCookies,
     ImagesController.addImageUser
   );
-
-/* router
-  .route("/consult") */
 
 export default router;
