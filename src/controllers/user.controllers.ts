@@ -100,5 +100,6 @@ export class UserController extends BaseEntity {
 
     console.log("User updated successfully");
     res.json("User updated successfully");
+    return;
   };
 }

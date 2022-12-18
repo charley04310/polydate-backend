@@ -5,4 +5,8 @@ const router = express.Router();
 
 router.route("/start").post(checkJwtCookies, MatchController.startMatch);
 
+router
+  .route("/validation")
+  .put(checkJwtCookies, MatchController.validOrRefuseMatch);
+
 export default router;
