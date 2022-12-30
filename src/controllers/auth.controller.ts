@@ -32,21 +32,25 @@ export class AuthController extends BaseEntity {
         throw new Error("Password incorrect");
       }
 
-      let user: ICreateToken = {
+      let userToken: ICreateToken = {
         userEmail: emailToCheck,
         userPassword: passwordToCheck,
+        userRoleId: userExist.userRoleId,
         userId: userExist.userId,
       };
 
-      let token = User.generateToken(user);
+      let token = User.generateToken(userToken);
       res
+        .status(200)
         .cookie("token", token, {
           httpOnly: true,
         })
-        .status(200)
-        .json({ message: "Logged in successfully 😊 👌" });
 
-      console.log(token);
+        .json({
+          message: "Logged in successfully 😊 👌",
+          token: token,
+          user: userToken,
+        });
     } catch (err) {
       res.status(400).json(err);
     }

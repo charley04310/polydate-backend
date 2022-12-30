@@ -12,10 +12,10 @@ router
   .put(checkJwtCookies, UserController.updateUser);
 //.post(userControl.createUser);
 
-/*router
-  .route("/:id")
-  .put(userControl.updateUser)
-  .get(userControl.getUser)
-  .delete(userControl.deleteUser); */
+router
+  .route("/user/image")
+  .put(checkJwtCookies, UserController.handleProfileUserImage);
+
+router.route("/user/feed/:id/:iduser").get(UserController.getRandomUserByGenre);
 
 export default router;

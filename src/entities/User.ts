@@ -27,8 +27,10 @@ export class UpdateUserDTO {
 export interface ICreateToken {
   userEmail: string;
   userPassword: string;
-  userId: number;
+  userRoleId?: number;
+  userId?: number;
 }
+
 @Entity("user", { schema: "Polydate" })
 export class User extends UpdateUserDTO {
   @PrimaryGeneratedColumn({ type: "int", name: "user_id" })
@@ -52,8 +54,14 @@ export class User extends UpdateUserDTO {
   @Max(3)
   userGenreId: number;
 
+  @Column("int", { name: "user_school_id" })
+  @IsInt()
+  @Min(1)
+  @Max(2)
+  userSchoolId: number;
+
   @Column("varchar", { name: "user_email", length: 100, unique: true })
-  @IsEmail()
+  @IsEmail({}, { message: "L'email fourni est invalide" })
   userEmail: string;
 
   @Column("varchar", { name: "user_firstname", length: 100 })
@@ -71,6 +79,13 @@ export class User extends UpdateUserDTO {
   @Column("varchar", { name: "user_password", length: 200 })
   userPassword: string;
 
+  /*  @Column("varchar", {
+    name: "user_image_link",
+    length: 255,
+    default: () => "/home",
+  })
+  userProfilImage: string; */
+
   @Column("varchar", { name: "user_city", length: 100 })
   @Length(3, 20)
   userCity: string;
@@ -80,7 +95,10 @@ export class User extends UpdateUserDTO {
 
   @Column("int", { name: "user_like_given", default: () => "'0'" })
   userLikeGiven: number;
-
+  /* 
+  @Column("varchar", { name: "user_image_link", default: () => "/home" })
+  useImageLink: string;
+ */
   @OneToMany(() => Comment, (comment) => comment.commentUser)
   comments: Comment[];
 

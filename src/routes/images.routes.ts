@@ -9,9 +9,13 @@ router
   .route("/upload/:id")
   .post(
     checkJwtCookies,
-    upload.array("images"),
+    upload.array("image"),
     checkJwtCookies,
     ImagesController.addImageUser
   );
+router
+  .route("/user/:id")
+  .get(ImagesController.getImagesUser)
+  .delete(ImagesController.deleteImageUser);
 
 export default router;

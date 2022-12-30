@@ -1,11 +1,14 @@
 //import { connect } from "../db/app-data-source";
 import { Request, Response } from "express";
-import { BaseEntity } from "typeorm";
+import { Any, BaseEntity, In, Not } from "typeorm";
 import { AppDataSource } from "../db/app-data-source";
 import { User } from "../entities/User";
-import { validate } from "class-validator";
+import { notContains, validate } from "class-validator";
 import { USER_ROLE } from "../enums/enums";
+import { reset } from "nodemon";
+import { Match } from "../entities/Match";
 
+let userRandomIndex: number | undefined = undefined;
 export class UserController extends BaseEntity {
   static findOneUserById = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
@@ -15,6 +18,7 @@ export class UserController extends BaseEntity {
         res.status(400).json(err);
       });
     if (user) {
+      const image = await user.images;
       res.json(user);
     } else {
       res.status(400).json("user does'not exist");
@@ -57,12 +61,14 @@ export class UserController extends BaseEntity {
     newUser.userDescription = body.userDescription;
     newUser.userPassword = User.setPassword(body.userPassword);
     newUser.userGenreId = parseInt(body.userGenreId);
+    newUser.userSchoolId = parseInt(body.userSchoolId);
     newUser.userIciPourId = parseInt(body.userIciPourId);
-
     const errors = await validate(newUser);
 
     if (errors.length > 0) {
-      res.status(400).send("validation failed. errors: " + errors);
+      console.log(errors);
+
+      res.status(400).send(errors);
     } else {
       const user = AppDataSource.getRepository(User).create(newUser);
       const results = AppDataSource.getRepository(User).save(user);
@@ -87,7 +93,10 @@ export class UserController extends BaseEntity {
     user.userFirstname = body.userFirstname;
     user.userLastname = body.userLastname;
     user.userCity = body.userCity;
+    user.userEmail = body.userEmail;
+    user.userDescription = body.userDescription;
     user.userGenreId = parseInt(body.userGenreId);
+    user.userSchoolId = parseInt(body.userSchoolId);
     user.userIciPourId = parseInt(body.userIciPourId);
 
     const errors = await validate(user);
@@ -101,5 +110,112 @@ export class UserController extends BaseEntity {
     console.log("User updated successfully");
     res.json("User updated successfully");
     return;
+  };
+
+  static handleProfileUserImage = async (req: Request, res: Response) => {
+    const body = req.body;
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository
+      .findOne({ where: { userId: parseInt(body.userId) } })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+
+    if (!user) {
+      console.error("User not found");
+      return;
+    }
+
+    //user.userProfilImage = body.userImageLink;
+    await userRepository.save(user);
+    res.json("Image updated successfully");
+  };
+
+  /* static getRandomUserByGenre = async (req: Request, res: Response) => {
+    // Get a connection to the database
+    const userRepository = AppDataSource.getRepository(User);
+
+    // Use the findOne method to get a random user with the desired genre
+    const user = await userRepository.findOne({
+      where: {
+        userGenreId: parseInt(req.params.id),
+        userId: Not(parseInt(req.params.iduser)),
+      },
+    });
+
+    if (user.length === 0) {
+      res
+        .status(404)
+        .json({ message: "No users with the desired genre found" });
+      return;
+    }
+
+    let randomIndex = Math.floor(Math.random() * user.length);
+
+    if (userRandomIndex === randomIndex) {
+      if (randomIndex === user.length) {
+        randomIndex = randomIndex - 1;
+      } else {
+        randomIndex = randomIndex + 1;
+      }
+    }
+    const randomUser = user[randomIndex];
+    await user.images;
+
+    console.log(user[randomIndex].matches2);
+    //const image = await user[randomIndex].images;
+
+    res.json(randomUser);
+  }; */
+
+  static getRandomUserByGenre = async (req: Request, res: Response) => {
+    const userRepository = AppDataSource.getRepository(User);
+    const matchRepository = AppDataSource.getRepository(Match);
+    const userId = req.params.iduser;
+
+    /*     const matchUerIdSrc = await matchRepository
+      .createQueryBuilder("match")
+      .select(["match.matchDstId"])
+      .where("match.matchSrcId = :userId", { userId })
+      .distinct()
+      .getMany();
+ */
+    const user = await userRepository
+      .createQueryBuilder("user")
+      .where("user.userId != :userId", { userId })
+      .andWhere("user.userGenreId = :userGenreId", {
+        userGenreId: parseInt(req.params.id),
+      })
+      .andWhere(
+        "user.user_id NOT IN (SELECT match.match_dst_id FROM `match` WHERE match.match_src_id = :matchSrcId)",
+        { matchSrcId: userId }
+      )
+      .orderBy("RAND()") // order the results randomly
+      .take(1) // only take one result
+      .getOne();
+
+    /* 
+    if (user.length === 0) {
+      res
+        .status(404)
+        .json({ message: "No users with the desired genre found" });
+      return;
+    } */
+
+    /*     let randomIndex = Math.floor(Math.random() * user.length);
+
+    if (userRandomIndex === randomIndex) {
+      if (randomIndex === user.length) {
+        randomIndex = randomIndex - 1;
+      } else {
+        randomIndex = randomIndex + 1;
+      }
+    }
+    const randomUser = user[randomIndex]; */
+    await user.images;
+
+    //const image = await user[randomIndex].images;
+    console.log(user);
+    res.json(user);
   };
 }
