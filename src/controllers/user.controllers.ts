@@ -4,9 +4,6 @@ import { Any, BaseEntity, In, Not } from "typeorm";
 import { AppDataSource } from "../db/app-data-source";
 import { User } from "../entities/User";
 import { notContains, validate } from "class-validator";
-import { USER_ROLE } from "../enums/enums";
-import { reset } from "nodemon";
-import { Match } from "../entities/Match";
 
 let userRandomIndex: number | undefined = undefined;
 export class UserController extends BaseEntity {
@@ -32,7 +29,7 @@ export class UserController extends BaseEntity {
         res.status(400).json(err);
       });
     if (user) {
-      console.log(user);
+      //console.log(user);
       //console.log(user.userEmail, user.userPassword);
       //  const userImage = await user.images
       return user;
@@ -40,16 +37,19 @@ export class UserController extends BaseEntity {
       res.status(400).json("user does'not exist");
     }
   };
+
   static findAllUser = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
     const allUser = await userRepository.find().catch((err) => {
       console.log(err);
     });
     if (allUser) {
-      console.log(allUser);
+      //console.log(allUser);
+
       res.json(allUser);
     }
   };
+
   static createUser = async (req: Request, res: Response) => {
     const newUser = new User();
     let body = req.body;
@@ -66,13 +66,11 @@ export class UserController extends BaseEntity {
     const errors = await validate(newUser);
 
     if (errors.length > 0) {
-      console.log(errors);
-
-      res.status(400).send(errors);
+      console.log("errors: ", errors);
+      return res.status(400).send(errors);
     } else {
       const user = AppDataSource.getRepository(User).create(newUser);
       const results = AppDataSource.getRepository(User).save(user);
-
       return res.send(results);
     }
   };
@@ -86,7 +84,7 @@ export class UserController extends BaseEntity {
       });
 
     if (!user) {
-      console.error("User not found");
+      res.status(400).json("User not found");
       return;
     }
 
@@ -112,6 +110,27 @@ export class UserController extends BaseEntity {
     return;
   };
 
+  static banOrUnBanUser = async (req: Request, res: Response) => {
+    const body = req.body;
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository
+      .findOne({ where: { userId: parseInt(req.params.id) } })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+
+    if (!user) {
+      console.error("User not found");
+      return;
+    }
+    user.userStatId = body.userStatId;
+    await userRepository.save(user);
+
+    console.log("User state updated successfully");
+    res.json("User state updated successfully");
+    return;
+  };
+
   static handleProfileUserImage = async (req: Request, res: Response) => {
     const body = req.body;
     const userRepository = AppDataSource.getRepository(User);
@@ -131,55 +150,9 @@ export class UserController extends BaseEntity {
     res.json("Image updated successfully");
   };
 
-  /* static getRandomUserByGenre = async (req: Request, res: Response) => {
-    // Get a connection to the database
-    const userRepository = AppDataSource.getRepository(User);
-
-    // Use the findOne method to get a random user with the desired genre
-    const user = await userRepository.findOne({
-      where: {
-        userGenreId: parseInt(req.params.id),
-        userId: Not(parseInt(req.params.iduser)),
-      },
-    });
-
-    if (user.length === 0) {
-      res
-        .status(404)
-        .json({ message: "No users with the desired genre found" });
-      return;
-    }
-
-    let randomIndex = Math.floor(Math.random() * user.length);
-
-    if (userRandomIndex === randomIndex) {
-      if (randomIndex === user.length) {
-        randomIndex = randomIndex - 1;
-      } else {
-        randomIndex = randomIndex + 1;
-      }
-    }
-    const randomUser = user[randomIndex];
-    await user.images;
-
-    console.log(user[randomIndex].matches2);
-    //const image = await user[randomIndex].images;
-
-    res.json(randomUser);
-  }; */
-
   static getRandomUserByGenre = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
-    const matchRepository = AppDataSource.getRepository(Match);
     const userId = req.params.iduser;
-
-    /*     const matchUerIdSrc = await matchRepository
-      .createQueryBuilder("match")
-      .select(["match.matchDstId"])
-      .where("match.matchSrcId = :userId", { userId })
-      .distinct()
-      .getMany();
- */
     const user = await userRepository
       .createQueryBuilder("user")
       .where("user.userId != :userId", { userId })
@@ -215,7 +188,7 @@ export class UserController extends BaseEntity {
     await user.images;
 
     //const image = await user[randomIndex].images;
-    console.log(user);
+    //console.log(user);
     res.json(user);
   };
 }

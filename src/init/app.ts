@@ -6,24 +6,16 @@ import userRoutes from "../routes/user.routes";
 import authRouter from "../routes/auth.routes";
 import imgRouter from "../routes/images.routes";
 import matchRouter from "../routes/match.routes";
-import { Server } from "socket.io";
 import cors from "cors";
-import http from "http";
 import path from "path";
-
+import { Server } from "socket.io";
+import http from "http";
+import MsgRouter from "../routes/messages.routes";
 export class App {
   app: Application;
-  httpServer: http.Server;
-  io: Server;
+
   constructor() {
     this.app = express();
-    this.httpServer = http.createServer(this.app);
-    this.io = new Server(this.httpServer, {
-      cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-      },
-    });
     this.middlewares();
     this.routes();
     this.connectionToDataBase();
@@ -45,9 +37,10 @@ export class App {
 
   private routes() {
     this.app.use("/api", userRoutes);
-    this.app.use("/auth", authRouter);
-    this.app.use("/images", imgRouter);
-    this.app.use("/match", matchRouter);
+    this.app.use("/api/auth", authRouter);
+    this.app.use("/api/images", imgRouter);
+    this.app.use("/api/match", matchRouter);
+    this.app.use("/api/messages", MsgRouter);
   }
   private async connectionToDataBase() {
     try {
@@ -60,9 +53,6 @@ export class App {
 
   async listen(port: string | number): Promise<void> {
     this.app.listen(port);
-    this.httpServer.listen(3000);
-
     console.log("Server on port", port);
-    console.log("Server Socket on port 3000");
   }
 }

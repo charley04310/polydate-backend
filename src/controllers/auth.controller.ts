@@ -41,15 +41,22 @@ export class AuthController extends BaseEntity {
 
       let token = User.generateToken(userToken);
       res
-        .status(200)
-        .cookie("token", token, {
+
+        .cookie("tokenPolydate", token, {
+          secure: false,
           httpOnly: true,
+          expires: new Date(Date.now() + 14400000), // 4 hours in milliseconds
+          sameSite: "strict",
         })
 
-        .json({
+        .send({
           message: "Logged in successfully 😊 👌",
-          token: token,
-          user: userToken,
+          user: {
+            userId: userExist.userId,
+            userEmail: userExist.userEmail,
+            userFirstname: userExist.userFirstname,
+            userRoleId: userExist.userRoleId,
+          },
         });
     } catch (err) {
       res.status(400).json(err);

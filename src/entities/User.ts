@@ -1,4 +1,12 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Comment } from "./Comment";
 import bcrypt from "bcrypt";
 import { Image } from "./Image";
@@ -12,6 +20,11 @@ import * as jwt from "jsonwebtoken";
 import config from "../init/config";
 import { IsInt, Length, IsEmail, Min, Max, Contains } from "class-validator";
 import { USER_ROLE, USER_STATE } from "../enums/enums";
+import { Role } from "./Role";
+import { Stat } from "./Stat";
+import { Genre } from "./Genre";
+import { IciPour } from "./IciPour";
+import { School } from "./School";
 export class UpdateUserDTO {
   @Length(2, 30)
   userFirstname: string;
@@ -79,13 +92,6 @@ export class User extends UpdateUserDTO {
   @Column("varchar", { name: "user_password", length: 200 })
   userPassword: string;
 
-  /*  @Column("varchar", {
-    name: "user_image_link",
-    length: 255,
-    default: () => "/home",
-  })
-  userProfilImage: string; */
-
   @Column("varchar", { name: "user_city", length: 100 })
   @Length(3, 20)
   userCity: string;
@@ -95,10 +101,42 @@ export class User extends UpdateUserDTO {
 
   @Column("int", { name: "user_like_given", default: () => "'0'" })
   userLikeGiven: number;
-  /* 
-  @Column("varchar", { name: "user_image_link", default: () => "/home" })
-  useImageLink: string;
- */
+
+  @ManyToOne(() => School, (school) => school.schoolId, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "user_school_id", referencedColumnName: "schoolId" }])
+  schoolId: IciPour;
+
+  @ManyToOne(() => IciPour, (icipour) => icipour.iciPourId, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "user_ici_pour_id", referencedColumnName: "iciPourId" }])
+  iciPourId: IciPour;
+
+  @ManyToOne(() => Genre, (genre) => genre.genreId, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "user_genre_id", referencedColumnName: "genreId" }])
+  genreId: Genre;
+
+  @ManyToOne(() => Role, (role) => role.roleId, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "user_role_id", referencedColumnName: "roleId" }])
+  roleId: Role;
+
+  @ManyToOne(() => Stat, (state) => state.statId, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "user_stat_id", referencedColumnName: "statId" }])
+  statId: Role;
+
   @OneToMany(() => Comment, (comment) => comment.commentUser)
   comments: Comment[];
 

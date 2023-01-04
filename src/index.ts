@@ -1,14 +1,13 @@
 import { App } from "./init/app";
+import { SocketServer } from "./init/socket";
 import config from "./init/config";
 
 async function main() {
   const app = new App();
+  const socketServer = new SocketServer();
   if (config.port != undefined) {
     app.listen(config.port);
-    app.io.on("connection", () => {
-      console.log("New client connected");
-      console.log("Client disconnected");
-    });
+    socketServer.listen();
   }
 }
 

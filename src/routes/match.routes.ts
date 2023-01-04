@@ -9,4 +9,8 @@ router
   .route("/validation")
   .put(checkJwtCookies, MatchController.validOrRefuseMatch);
 
+router
+  .route("/obtenir/:id")
+  .get(checkJwtCookies, MatchController.getAllMatches);
+
 export default router;

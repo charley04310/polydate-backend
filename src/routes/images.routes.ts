@@ -16,6 +16,6 @@ router
 router
   .route("/user/:id")
   .get(ImagesController.getImagesUser)
-  .delete(ImagesController.deleteImageUser);
+  .delete(checkJwtCookies, ImagesController.deleteImageUser);
 
 export default router;
