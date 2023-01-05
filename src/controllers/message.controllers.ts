@@ -47,6 +47,8 @@ export class MessageControllers extends BaseEntity {
 
     const message = await matchRepository.find({
       where: { messageMatchId: parseInt(matchId) },
+      take: 10,
+      order: { messageDate: "ASC" },
     });
 
     if (!message) {
@@ -54,7 +56,6 @@ export class MessageControllers extends BaseEntity {
       return;
     }
     console.log(message);
-    //console.log(allMatchUser);
     res.json(message);
   };
 }

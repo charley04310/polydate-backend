@@ -15,45 +15,37 @@ export class UserController extends BaseEntity {
         res.status(400).json(err);
       });
     if (user) {
-      const image = await user.images;
-      res.json(user);
+      await user.images;
+      return res.json(user);
     } else {
       res.status(400).json("user does'not exist");
     }
   };
   static findOneUserByMail = async (email: string, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository
-      .findOne({ where: { userEmail: email } })
-      .catch((err) => {
-        res.status(400).json(err);
-      });
-    if (user) {
-      //console.log(user);
-      //console.log(user.userEmail, user.userPassword);
-      //  const userImage = await user.images
+    const user = await userRepository.findOne({ where: { userEmail: email } });
+
+    if (user instanceof User) {
       return user;
     } else {
-      res.status(400).json("user does'not exist");
+      return false;
     }
   };
 
   static findAllUser = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
     const allUser = await userRepository.find().catch((err) => {
-      console.log(err);
+      res.status(500).json(err);
     });
     if (allUser) {
-      //console.log(allUser);
-
-      res.json(allUser);
+      res.status(200).json(allUser);
     }
   };
 
   static createUser = async (req: Request, res: Response) => {
     const newUser = new User();
     let body = req.body;
-
+    if (body.userRoleId) return res.status(401).send("pas autorisé");
     newUser.userFirstname = body.userFirstname;
     newUser.userLastname = body.userLastname;
     newUser.userCity = body.userCity;
@@ -65,13 +57,25 @@ export class UserController extends BaseEntity {
     newUser.userIciPourId = parseInt(body.userIciPourId);
     const errors = await validate(newUser);
 
+    const isStudentMail = (val: string) => {
+      const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@etu\.montpellier\.fr$/;
+      return regex.test(val);
+    };
+
+    if (!isStudentMail(newUser.userEmail)) {
+      return res
+        .status(201)
+        .send(
+          "Vous devez utiliser une adresse mail étudiante pour vous inscrire"
+        );
+    }
     if (errors.length > 0) {
       console.log("errors: ", errors);
       return res.status(400).send(errors);
     } else {
       const user = AppDataSource.getRepository(User).create(newUser);
-      const results = AppDataSource.getRepository(User).save(user);
-      return res.send(results);
+      AppDataSource.getRepository(User).save(user);
+      return res.status(200).send("user created");
     }
   };
   static updateUser = async (req: Request, res: Response) => {
@@ -80,10 +84,12 @@ export class UserController extends BaseEntity {
     const user = await userRepository
       .findOne({ where: { userId: parseInt(body.userId) } })
       .catch((err) => {
+        console.log(err);
         res.status(400).json(err);
       });
 
     if (!user) {
+      console.log("user not found");
       res.status(400).json("User not found");
       return;
     }
@@ -103,30 +109,25 @@ export class UserController extends BaseEntity {
       res.status(400).json(errors);
       return;
     }
-    await userRepository.save(user);
 
-    console.log("User updated successfully");
-    res.json("User updated successfully");
+    await userRepository.save(user);
+    res.status(200).json("User updated successfully");
     return;
   };
 
   static banOrUnBanUser = async (req: Request, res: Response) => {
     const body = req.body;
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository
-      .findOne({ where: { userId: parseInt(req.params.id) } })
-      .catch((err) => {
-        res.status(400).json(err);
-      });
-
+    const user = await userRepository.findOne({
+      where: { userId: parseInt(req.params.id) },
+    });
     if (!user) {
-      console.error("User not found");
+      res.status(400).json("User not found");
       return;
     }
     user.userStatId = body.userStatId;
     await userRepository.save(user);
 
-    console.log("User state updated successfully");
     res.json("User state updated successfully");
     return;
   };
@@ -134,18 +135,14 @@ export class UserController extends BaseEntity {
   static handleProfileUserImage = async (req: Request, res: Response) => {
     const body = req.body;
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository
-      .findOne({ where: { userId: parseInt(body.userId) } })
-      .catch((err) => {
-        res.status(400).json(err);
-      });
+    const user = await userRepository.findOne({
+      where: { userId: parseInt(body.userId) },
+    });
 
     if (!user) {
-      console.error("User not found");
+      res.status(400).json("User images not found");
       return;
     }
-
-    //user.userProfilImage = body.userImageLink;
     await userRepository.save(user);
     res.json("Image updated successfully");
   };
@@ -155,6 +152,16 @@ export class UserController extends BaseEntity {
     const userId = req.params.iduser;
     const user = await userRepository
       .createQueryBuilder("user")
+      .select([
+        "user.userId",
+        "user.userFirstname",
+        "user.userLastname",
+        "user.userCity",
+        "user.userDescription",
+        "user.userSchoolId",
+        "user.userIciPourId",
+        "user.userGenreId",
+      ])
       .where("user.userId != :userId", { userId })
       .andWhere("user.userGenreId = :userGenreId", {
         userGenreId: parseInt(req.params.id),
@@ -163,32 +170,11 @@ export class UserController extends BaseEntity {
         "user.user_id NOT IN (SELECT match.match_dst_id FROM `match` WHERE match.match_src_id = :matchSrcId)",
         { matchSrcId: userId }
       )
-      .orderBy("RAND()") // order the results randomly
-      .take(1) // only take one result
+      .orderBy("RAND()")
+      .take(1)
       .getOne();
 
-    /* 
-    if (user.length === 0) {
-      res
-        .status(404)
-        .json({ message: "No users with the desired genre found" });
-      return;
-    } */
-
-    /*     let randomIndex = Math.floor(Math.random() * user.length);
-
-    if (userRandomIndex === randomIndex) {
-      if (randomIndex === user.length) {
-        randomIndex = randomIndex - 1;
-      } else {
-        randomIndex = randomIndex + 1;
-      }
-    }
-    const randomUser = user[randomIndex]; */
     await user.images;
-
-    //const image = await user[randomIndex].images;
-    //console.log(user);
     res.json(user);
   };
 }

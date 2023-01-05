@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
 
@@ -24,7 +23,7 @@ export const upload = multer({
   storage: storage,
   limits: {
     fileSize: 1024 * 1024 * 5,
-    files: 5,
+    files: 1,
   },
   fileFilter: fileFilter,
 });

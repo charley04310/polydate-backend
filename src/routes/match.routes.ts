@@ -3,7 +3,7 @@ import { MatchController } from "../controllers/match.controllers";
 import { checkJwtCookies } from "../middleware/cookieJwtAuth";
 const router = express.Router();
 
-router.route("/start").post(checkJwtCookies, MatchController.startMatch);
+router.route("/start").post(checkJwtCookies, MatchController.sendMatchRequest);
 
 router
   .route("/validation")

@@ -5,14 +5,21 @@ import { AppDataSource } from "../db/app-data-source";
 import request from "request-promise";
 import { Match } from "../entities/Match";
 import { USER_STATE } from "../enums/enums";
-
+export enum MATCH_STATE {
+  EN_ATTENTE = 2,
+  VALIDE = 1,
+  REFUSER = 3,
+}
 export class MatchController extends BaseEntity {
   // #TODO: SE CONNECTER
 
-  static async startMatch(req: Request, res: Response) {
+  static async sendMatchRequest(req: Request, res: Response) {
     const newMatch = new Match();
     let body = req.body;
-
+    if (body.matchStatId !== undefined)
+      return res
+        .status(401)
+        .send("Vous ne pouvez pas envoyer un match avec un statut");
     newMatch.matchSrcId = body.userId;
     newMatch.matchDstId = body.matchDstId;
     newMatch.matchTypeId = body.matchTypeId;
@@ -22,10 +29,9 @@ export class MatchController extends BaseEntity {
     if (errors.length > 0) {
       res.status(400).send("validation failed. errors: " + errors);
     } else {
-      const Image = AppDataSource.getRepository(Match).create(newMatch);
-      const results = AppDataSource.getRepository(Match).save(Image);
-
-      return res.send(results);
+      const match = AppDataSource.getRepository(Match).create(newMatch);
+      AppDataSource.getRepository(Match).save(match);
+      return res.send("Match sent!");
     }
   }
 
@@ -41,6 +47,8 @@ export class MatchController extends BaseEntity {
       })
       .catch((err) => {
         res.status(400).send(err);
+        console.error(err);
+
         return;
       });
 

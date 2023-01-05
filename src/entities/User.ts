@@ -70,7 +70,7 @@ export class User extends UpdateUserDTO {
   @Column("int", { name: "user_school_id" })
   @IsInt()
   @Min(1)
-  @Max(2)
+  @Max(3)
   userSchoolId: number;
 
   @Column("varchar", { name: "user_email", length: 100, unique: true })
