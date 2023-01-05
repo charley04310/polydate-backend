@@ -41,46 +41,20 @@ export class MessageControllers extends BaseEntity {
     }
   }
 
-  static getAllMatches = async (req: Request, res: Response) => {
-    const matchRepository = AppDataSource.getRepository(Match);
-    const userId = req.params.id;
+  static getAllMessageByMatchId = async (req: Request, res: Response) => {
+    const matchRepository = AppDataSource.getRepository(Message);
+    const matchId = req.params.id;
 
-    const match = await matchRepository
-      .createQueryBuilder("match")
-      .innerJoinAndSelect("match.matchSrc", "srcUser")
-      // SELECTION particulière ne marche pas...
-      .innerJoinAndSelect("match.matchDst", "dstUser")
-      .where([
-        { matchDstId: parseInt(userId), matchStatId: Not(USER_STATE.REFUSED) },
-        { matchSrcId: parseInt(userId), matchStatId: USER_STATE.VALIDE },
-      ])
-      .getMany();
+    const message = await matchRepository.find({
+      where: { messageMatchId: parseInt(matchId) },
+    });
 
-    let allMatchUser = [];
-
-    for (let i = 0; i < match.length; i++) {
-      let matchUser = {
-        matchId: match[i].matchId,
-        matchTypeId: match[i].matchTypeId,
-        matchStatId: match[i].matchStatId,
-        matchDate: match[i].matchDate,
-        matchSrcId: {
-          userId: match[i].matchSrc.userId,
-          userFirstname: match[i].matchSrc.userFirstname,
-          userLastname: match[i].matchSrc.userLastname,
-          userImage: await match[i].matchDst.images,
-        },
-        matchDstId: {
-          userId: match[i].matchDst.userId,
-          userFirstname: match[i].matchDst.userFirstname,
-          userLastname: match[i].matchDst.userLastname,
-          userImage: await match[i].matchDst.images,
-        },
-      };
-
-      allMatchUser.push(matchUser);
+    if (!message) {
+      res.status(400).send("No message found");
+      return;
     }
+    console.log(message);
     //console.log(allMatchUser);
-    res.json(allMatchUser);
+    res.json(message);
   };
 }

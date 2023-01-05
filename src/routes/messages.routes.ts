@@ -8,4 +8,9 @@ MsgRouter.route("/envoyer").post(
   MessageControllers.sendMessage
 );
 
+MsgRouter.route("/otenir/:id").get(
+  checkJwtCookies,
+  MessageControllers.getAllMessageByMatchId
+);
+
 export default MsgRouter;
