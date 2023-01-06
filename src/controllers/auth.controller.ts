@@ -13,12 +13,11 @@ export class AuthController extends BaseEntity {
     let passwordToCheck: string = req.body.userPassword;
 
     const userExist = await UserController.findOneUserByMail(emailToCheck, res);
-    if (userExist === false) return;
-
-    if (userExist === undefined) {
-      res.status(400).json("User not found");
+    if (userExist === false) {
+      res.status(404).json("Le user n'existe pas");
       return;
     }
+
     if (userExist.userStatId != USER_STATE.VALIDE) {
       res.status(401).json("Pas autorisé");
       return;
@@ -30,7 +29,7 @@ export class AuthController extends BaseEntity {
     );
 
     if (!pwdIsSimilar) {
-      res.status(400).json("Wrong password");
+      res.status(401).json("Wrong password");
       return;
     }
 
@@ -63,6 +62,7 @@ export class AuthController extends BaseEntity {
   }
 
   static async logout(req: Request, res: Response) {
-    res.clearCookie("tokenPolydate").send("Logged out successfully 😊 👌");
+    res.clearCookie("tokenPolydate").json("Logged out successfully 😊 👌");
+    console.log("caca");
   }
 }

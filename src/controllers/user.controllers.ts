@@ -12,13 +12,14 @@ export class UserController extends BaseEntity {
     const user = await userRepository
       .findOne({ where: { userId: parseInt(req.params.id) } })
       .catch((err) => {
-        res.status(400).json(err);
+        res.status(500).json(err);
       });
     if (user) {
       await user.images;
+      console.log(user);
       return res.json(user);
     } else {
-      res.status(400).json("user does'not exist");
+      res.status(404).json("user does'not exist");
     }
   };
   static findOneUserByMail = async (email: string, res: Response) => {
@@ -64,18 +65,18 @@ export class UserController extends BaseEntity {
 
     if (!isStudentMail(newUser.userEmail)) {
       return res
-        .status(201)
+        .status(401)
         .send(
           "Vous devez utiliser une adresse mail étudiante pour vous inscrire"
         );
     }
     if (errors.length > 0) {
       console.log("errors: ", errors);
-      return res.status(400).send(errors);
+      res.status(401).send(errors);
     } else {
       const user = AppDataSource.getRepository(User).create(newUser);
       AppDataSource.getRepository(User).save(user);
-      return res.status(200).send("user created");
+      res.status(200).send("user created");
     }
   };
   static updateUser = async (req: Request, res: Response) => {
@@ -170,11 +171,21 @@ export class UserController extends BaseEntity {
         "user.user_id NOT IN (SELECT match.match_dst_id FROM `match` WHERE match.match_src_id = :matchSrcId)",
         { matchSrcId: userId }
       )
+      .andWhere(
+        "user.user_id NOT IN (SELECT match.match_src_id FROM `match` WHERE match.match_dst_id = :matchDstId)",
+        { matchDstId: userId }
+      )
       .orderBy("RAND()")
       .take(1)
       .getOne();
 
-    await user.images;
-    res.json(user);
+    try {
+      const images = await user.images;
+      if (images) {
+        await user.images;
+      }
+      console.log(user);
+      res.json(user);
+    } catch (e) {}
   };
 }

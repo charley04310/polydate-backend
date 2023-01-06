@@ -30,6 +30,7 @@ export class App {
       cors({
         credentials: true,
         origin: "http://localhost:8010",
+        methods: ["GET", "POST", "PUT", "DELETE"],
       })
     );
     this.app.use(express.static(path.join(__dirname, "public")));
