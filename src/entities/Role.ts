@@ -1,6 +1,5 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
-@Index("IDX_90d673e528dac2c8c214314391", ["roleLabel"], { unique: true })
 @Index("unq_role", ["roleLabel"], { unique: true })
 @Entity("role", { schema: "Polydate" })
 export class Role {

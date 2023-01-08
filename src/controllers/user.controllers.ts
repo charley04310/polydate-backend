@@ -90,7 +90,6 @@ export class UserController extends BaseEntity {
       });
 
     if (!user) {
-      console.log("user not found");
       res.status(400).json("User not found");
       return;
     }
@@ -124,13 +123,11 @@ export class UserController extends BaseEntity {
     });
     if (!user) {
       res.status(400).json("User not found");
-      return;
     }
     user.userStatId = body.userStatId;
     await userRepository.save(user);
 
     res.json("User state updated successfully");
-    return;
   };
 
   static handleProfileUserImage = async (req: Request, res: Response) => {

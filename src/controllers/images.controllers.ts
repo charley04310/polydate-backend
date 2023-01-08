@@ -26,14 +26,12 @@ export class ImagesController extends BaseEntity {
     const imageSaving = await AppDataSource.getRepository(Image).save(
       newImages
     );
-    return res.send(imageSaving);
+    res.send(imageSaving);
   }
 
   static async getImagesUser(req: Request, res: Response) {
     const imageId = req.params.id;
-    res.sendFile(
-      `/home/charley/polytech/woa/polydate/Polydate-API/public/images/${imageId}`
-    );
+    res.sendFile(`/app/public/images/${imageId}`);
   }
 
   static async deleteImageUser(req: Request, res: Response) {
@@ -49,19 +47,19 @@ export class ImagesController extends BaseEntity {
         })
         .catch((err) => {
           console.error(err);
-          return res.status(500).send(err);
+          res.status(500).send(err);
         });
 
-      fs.unlink(`./public/images/${image.imageLink}`, (err) => {
+      fs.unlink(`/app/public/images/${image.imageLink}`, (err) => {
         if (err) {
           console.error(err);
-          return res.status(500).send(err);
+          res.status(500).send(err);
         }
       });
 
-      return res.send("image deleted");
+      res.send("image deleted");
     } else {
-      return res.status(400).json("image does'not exist");
+      res.status(400).json("image does'not exist");
     }
   }
 }

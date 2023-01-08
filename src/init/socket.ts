@@ -27,7 +27,7 @@ export class SocketServer {
     this.app.use(
       cors({
         credentials: true,
-        origin: "http://localhost:8010",
+        origin: "https://cluster-2022-5.dopolytech.fr",
       })
     );
   }

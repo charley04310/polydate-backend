@@ -4,12 +4,9 @@ import { DataSource } from "typeorm";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: "172.19.0.2",
-  port: 3306,
-  username: "root",
-  password: "charley",
+  url: "mysql://root:root@mysql:3306/Polydate",
   database: "Polydate",
-  synchronize: true,
+  synchronize: false,
   logging: false,
   entities: ["src/entities/**/*.ts"],
   migrations: ["src/migration/**/*.ts"],

@@ -2,7 +2,8 @@
 /build
 /output
 .env
-/public/images
-package-lock.json
+./public/images
+./package-lock.json
 package.json
 tsconfig.json
+/src/db/app-data-source.ts

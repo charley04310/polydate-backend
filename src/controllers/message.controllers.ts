@@ -55,7 +55,6 @@ export class MessageControllers extends BaseEntity {
       res.status(400).send("No message found");
       return;
     }
-    console.log(message);
     res.json(message);
   };
 }

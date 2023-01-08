@@ -14,8 +14,7 @@ export class AuthController extends BaseEntity {
 
     const userExist = await UserController.findOneUserByMail(emailToCheck, res);
     if (userExist === false) {
-      res.status(404).json("Le user n'existe pas");
-      return;
+      return res.status(404).json("Le user n'existe pas");
     }
 
     if (userExist.userStatId != USER_STATE.VALIDE) {
@@ -63,6 +62,5 @@ export class AuthController extends BaseEntity {
 
   static async logout(req: Request, res: Response) {
     res.clearCookie("tokenPolydate").json("Logged out successfully 😊 👌");
-    console.log("caca");
   }
 }

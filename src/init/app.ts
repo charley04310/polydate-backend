@@ -29,7 +29,7 @@ export class App {
     this.app.use(
       cors({
         credentials: true,
-        origin: "http://localhost:8010",
+        origin: "https://cluster-2022-5.dopolytech.fr",
         methods: ["GET", "POST", "PUT", "DELETE"],
       })
     );
