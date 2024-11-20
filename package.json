@@ -30,7 +30,7 @@
     "nodemon": "^2.0.20",
     "reflect-metadata": "^0.1.13",
     "request-promise": "^4.2.6",
-    "socket.io": "^4.5.4",
+    "socket.io": "^4.8.1",
     "ts-node": "^10.9.1",
     "type": "^2.7.2",
     "typeorm": "^0.3.11",
